@@ -52,15 +52,27 @@ if(isset($_POST['addbarangkeluar'])){
     $ambildatanya = mysqli_fetch_array($cekstocksekarang);
 
     $stocksekarang = $ambildatanya['stock'];
-    $tambahkanstocksekarangdenganquantity = $stocksekarang - $qty;
 
-    $addtokeluar = mysqli_query($conn, "INSERT INTO barang_keluar (id_barang, penerima, qty) values ('$barangnya', '$penerima','$qty')");
-    $updatestockmasuk = mysqli_query($conn, "UPDATE stock SET stock='$tambahkanstocksekarangdenganquantity' WHERE id_barang='$barangnya'");
-    if($addtokeluar && $updatestockmasuk){
-        header('location:keluar.php');
+    if($stocksekarang >= $qty){
+        // Kalau barang cukup
+        $tambahkanstocksekarangdenganquantity = $stocksekarang - $qty;
+
+        $addtokeluar = mysqli_query($conn, "INSERT INTO barang_keluar (id_barang, penerima, qty) values ('$barangnya', '$penerima','$qty')");
+        $updatestockmasuk = mysqli_query($conn, "UPDATE stock SET stock='$tambahkanstocksekarangdenganquantity' WHERE id_barang='$barangnya'");
+        if($addtokeluar && $updatestockmasuk){
+            header('location:keluar.php');
+        }else{
+            echo 'Gagal Menambah Barang';
+            header('location:keluar.php');
+        }
     }else{
-        echo 'Gagal Menambah Barang';
-        header('location:keluar.php');
+        // Kalau barang tidak cukup
+        echo '
+            <script>
+            alert("Stock barang tidak cukup");
+            window.location.href="keluar.php";
+        </script>
+        ';
     }
 }
 
